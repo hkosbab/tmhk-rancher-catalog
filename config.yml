@@ -1,0 +1,8 @@
+name: Tomahawk-Media Private Rancher Catalog
+description: |
+  # Description of the Catalog Entry
+version: 0.0.1
+category: Private Machines
+maintainer: Tomahawk-Media
+license: # The license
+projectURL: http://www.tomahawk-media.com
