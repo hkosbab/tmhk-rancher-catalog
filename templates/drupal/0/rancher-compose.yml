@@ -37,14 +37,14 @@ catalog:
       default: "bitnami_drupal"
       type: "string"  
     - variable: drupal_username
-      description: "WordPress application username"
-      label: "WordPress application username"
+      description: "Drupal application username"
+      label: "Drupal application username"
       required: true
       default: "admin"
       type: "string"  
     - variable: drupal_password
-      description: "WordPress application password"
-      label: "WordPress application password"
+      description: "Drupal application password"
+      label: "Drupal application password"
       required: true
       default: "bitnami"
       type: "string"       
