@@ -1,0 +1,8 @@
+name: Mailserver
+description: 
+  # Description of the Catalog Entry
+version: 0.1-tmhk
+category: Packages
+maintainer: Tomahawk-Media 
+license: # The license
+projectURL: http://www.tomahawk-media.com
