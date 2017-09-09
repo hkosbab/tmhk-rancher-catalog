@@ -1,7 +1,7 @@
 version: '2'
 services:
   mariadb:
-      image: 'mariadb:latest'
+      image: 'mariadb:10.3'
       volumes:
         - 'mariadb_data:/mariadb'
       environment:
@@ -12,12 +12,9 @@ services:
   drupal:
       image: drupal:8.3-apache
       ports:
-      - 8080:80
+      - 20080:80
       volumes:
-      - drupal_module:/var/www/html/modules
-      - drupal_profile:/var/www/html/profiles
-      - drupal_themes:/var/www/html/themes
-      - drupal_sites:/var/www/html/sites
+      - drupal:/var/www/html/
       depends_on:
         - mariadb
       environment:
@@ -27,7 +24,7 @@ services:
         - DRUPAL_USERNAME=${drupal_username}
         - DRUPAL_PASSWORD=${drupal_password}
   drupal-lb:
-    image: rancher/lb-service-haproxy:v0.7.5
+    image: rancher/lb-service-haproxy:v0.7.6
     ports:
       - ${public_port}:${public_port}
 volumes:
