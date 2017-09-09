@@ -1,7 +1,7 @@
 version: '2'
 catalog:
   name: "Drupal"
-  version: "v0.1-tmhk"
+  version: "v0.2-tmhk"
   description: "Blog tool, publishing platform and CMS based on bitnami images"
   uuid: Drupal-1
   minimum_rancher_version: v0.51.0
