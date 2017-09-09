@@ -3,5 +3,5 @@ catalog:
   version: 7.4.2
   description: JIRA Issue Management
   uuid: jira-1
-  minimum_rancher_version: # The minimum version of Rancher that supports the template
+  minimum_rancher_version: v0.51.0
   questions: #Used to request user input for configuration options
