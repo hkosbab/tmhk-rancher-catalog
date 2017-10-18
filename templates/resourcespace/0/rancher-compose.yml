@@ -1,7 +1,6 @@
 catalog:
   name: ResourceSpace
-  version: 8.3
-  description: Digital Asset Management
-  uuid: rs-1
-  minimum_rancher_version: v0.51.0
+  version: "8.3"
+  description: "Digital Asset Management"
+  minimum_rancher_version: v1.1.0
   #questions: #Used to request user input for configuration options
