@@ -9,8 +9,6 @@ services:
             io.rancher.container.hostname_override: container_name
         links:
         - mariadb:mariadb
-        entrypoint:
-        - /usr/sbin/apache2ctl -D FOREGROUND
     mariadb:
         image: mariadb:latest
         environment:
