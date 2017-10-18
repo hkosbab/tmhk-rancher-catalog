@@ -1,0 +1,45 @@
+version: '2'
+services:
+    resourcespace:
+        image: hkosbab/resourcespace
+        volumes_from:
+        - resourcespace-data
+        labels:
+            io.rancher.sidekicks: resourcespace-data
+            io.rancher.container.hostname_override: container_name
+        links:
+        - mariadb:mariadb
+        entrypoint:
+        - /usr/sbin/apache2ctl -D FOREGROUND
+    mariadb:
+        image: mariadb:latest
+        environment:
+            MYSQL_DATABASE: resourcespace
+            MYSQL_PASSWORD: brSuhb@Ck[iNM.)l
+            MYSQL_ROOT_PASSWORD: Z-<&yq&39L^fMW(3
+            MYSQL_USER: resourcespace
+        labels:
+            io.rancher.sidekicks: mariadb-data
+            io.rancher.container.hostname_override: container_name
+    mariadb-data:
+        image: mariadb:latest
+        entrypoint:
+        - /bin/true
+        volumes:
+        - /var/lib/mysql
+        tty: true
+        labels:
+            io.rancher.container.start_once: 'true'
+            io.rancher.container.hostname_override: container_name
+    nc-lb:
+        image: rancher/lb-service-haproxy:v0.7.6
+        expose:
+        - 44081:16081/tcp
+        labels:
+            io.rancher.container.agent.role: environmentAdmin
+            io.rancher.container.create_agent: 'true'
+    resourcespace-data:
+        image: hkosbab/resourcespace
+        volumes:
+        - rsfilestore:/var/www/html/filestore
+        - rsbackups:/backups
