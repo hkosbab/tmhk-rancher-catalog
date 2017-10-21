@@ -1,192 +1,99 @@
-version: '2'
-services:
+postgres-datavolume:
+  labels:
+    io.rancher.container.start_once: 'true'
+    io.rancher.container.hostname_override: container_name
+  image: nuxeo/postgres
+  entrypoint: chown -R postgres:postgres /var/lib/postgresql/data
+  volume_driver: ${volumedriver}
+  volumes:
+    - /var/lib/postgresql/data
 
-  postgres-datavolume:
-    labels:
-      io.rancher.container.start_once: 'true'
-      io.rancher.container.hostname_override: container_name
-    image: nuxeo/postgres
-    entrypoint: chown -R postgres:postgres /var/lib/postgresql/data
-    volume_driver: ${volumedriver}
-    volumes:
-      - /var/lib/postgresql/data
+postgres:
+  image: nuxeo/postgres
+  environment:
+    - POSTGRES_USER=nuxeo
+    - POSTGRES_PASSWORD=nuxeo    
+  labels:
+    io.rancher.sidekicks: postgres-datavolume
+    io.rancher.container.hostname_override: container_name
+  volumes_from:
+  - postgres-datavolume
 
-  postgres:
-    image: nuxeo/postgres
-    environment:
-      - POSTGRES_USER=nuxeo
-      - POSTGRES_PASSWORD=nuxeo    
-    labels:
-      io.rancher.sidekicks: postgres-datavolume
-      io.rancher.container.hostname_override: container_name
-    volumes_from:
-    - postgres-datavolume
+# Copied from default Rancher ES Stack : don't modifiy service names
+elasticsearch-masters:
+  image: rancher/elasticsearch-conf:v0.4.0
+  labels:
+    io.rancher.container.hostname_override: container_name
+    io.rancher.sidekicks: elasticsearch-base-master,elasticsearch-datavolume-masters
+  volume_driver: ${volumedriver}
+elasticsearch-datavolume-masters:
+  labels:
+    elasticsearch.datanode.config.version: '0'
+    io.rancher.container.hostname_override: container_name
+    io.rancher.container.start_once: true
+  entrypoint: /bin/true
+  image: elasticsearch:1.7.3
+  volume_driver: ${volumedriver}
+elasticsearch-base-master:
+  labels:
+    elasticsearch.master.config.version: '0'
+    io.rancher.container.hostname_override: container_name
+  image: elasticsearch:1.7.3
+  net: "container:elasticsearch-masters"
+  volumes_from:
+    - elasticsearch-masters
+    - elasticsearch-datavolume-masters
+  entrypoint:
+    - /opt/rancher/bin/run.sh
 
-  redis:
-    labels:    
-      io.rancher.container.hostname_override: container_name
-    tty: true
-    image: redis:3.0.3
-    stdin_open: true
-    volume_driver: ${volumedriver}
 
-  nuxeo-datavolume:
-    labels:
-      io.rancher.container.start_once: 'true'
-      io.rancher.container.hostname_override: container_name
-    image: nuxeo
-    entrypoint: /bin/true
-    volume_driver: ${volumedriver}
-    volumes:
-      - nxdata:/var/lib/nuxeo/data
-      - nxlog:/var/log/nuxeo
-      - nxconf:/etc/nuxeo
-  
-  nuxeo:
-    environment:
-      NUXEO_CLID: ${clid}
-      NUXEO_PACKAGES: ${packages}
-      NUXEO_DB_HOST: postgres
-      NUXEO_DB_TYPE: postgresql
-      NUXEO_ES_HOSTS: elasticsearch:9300
-      NUXEO_DATA: nxdata
-      NUXEO_LOG:  nxlog
-      NUXEO_REDIS_HOST: redis
-      NUXEO_URL: ${url}
-    labels:
-      io.rancher.sidekicks: nuxeo-datavolume    
-      io.rancher.container.hostname_override: container_name
-      io.rancher.scheduler.affinity:container_label_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
-    image: nuxeo:FT
-    links:
-    - redis:redis
-    - postgres:postgres
-    - es-master:elasticsearch
-    volumes_from:
-    - nuxeo-datavolume
-  
-  lb:
-    expose:
-    - 80:8080
-    image: rancher/load-balancer-service
-    links:
-    - nuxeo:nuxeo
-  es-master:
-    labels:
-      io.rancher.scheduler.affinity:container_label_soft_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
-      io.rancher.container.hostname_override: container_name
-      io.rancher.sidekicks: es-storage{{- if eq .Values.UPDATE_SYSCTL "true" -}},es-sysctl{{- end}}
-    image: docker.elastic.co/elasticsearch/elasticsearch:5.5.1
-    environment:
-    - "cluster.name=${cluster_name}"
-    - "node.name=$${HOSTNAME}"
-    - "bootstrap.memory_lock=true"
-    - "xpack.security.enabled=false"
-    - "ES_JAVA_OPTS=-Xms${master_heap_size} -Xmx${master_heap_size}"
-    - "discovery.zen.ping.unicast.hosts=es-master"
-    - "discovery.zen.minimum_master_nodes=${minimum_master_nodes}"
-    - "node.master=true"
-    - "node.data=false"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nofile:
-        soft: 65536
-        hard: 65536
-    mem_limit: ${master_mem_limit}
-    mem_swappiness: 0
-    cap_add:
-    - IPC_LOCK
-    volumes_from: 
-    - es-storage
+redis:
+  labels:    
+    io.rancher.container.hostname_override: container_name
+  tty: true
+  image: redis:latest
+  stdin_open: true
+  volume_driver: ${volumedriver}
 
-  es-data:
-    labels:
-      io.rancher.scheduler.affinity:container_label_soft_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
-      io.rancher.container.hostname_override: container_name
-      io.rancher.sidekicks: es-storage{{- if eq .Values.UPDATE_SYSCTL "true" -}},es-sysctl{{- end}}
-    image: docker.elastic.co/elasticsearch/elasticsearch:5.5.1
-    environment:
-    - "cluster.name=${cluster_name}"
-    - "node.name=$${HOSTNAME}"
-    - "bootstrap.memory_lock=true"
-    - "xpack.security.enabled=false"
-    - "discovery.zen.ping.unicast.hosts=es-master"
-    - "ES_JAVA_OPTS=-Xms${data_heap_size} -Xmx${data_heap_size}"
-    - "node.master=false"
-    - "node.data=true"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nofile:
-        soft: 65536
-        hard: 65536
-    mem_limit: ${data_mem_limit}
-    mem_swappiness: 0
-    cap_add:
-    - IPC_LOCK
-    volumes_from:
-    - es-storage
-    depends_on:
-    - es-master
+nuxeo-datavolume:
+  labels:
+    io.rancher.container.start_once: 'true'
+    io.rancher.container.hostname_override: container_name
+  image: nuxeo
+  entrypoint: /bin/true
+  volume_driver: ${volumedriver}
+  volumes:
+    - nxdata:/var/lib/nuxeo/data
+    - nxlog:/var/log/nuxeo
+    - nxconf:/etc/nuxeo
 
-  es-client:
-    labels:
-      io.rancher.scheduler.affinity:container_label_soft_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
-      io.rancher.container.hostname_override: container_name
-      io.rancher.sidekicks: es-storage{{- if eq .Values.UPDATE_SYSCTL "true" -}},es-sysctl{{- end}}
-    image: docker.elastic.co/elasticsearch/elasticsearch:5.5.1
-    environment:
-    - "cluster.name=${cluster_name}"
-    - "node.name=$${HOSTNAME}"
-    - "bootstrap.memory_lock=true"
-    - "xpack.security.enabled=false"
-    - "discovery.zen.ping.unicast.hosts=es-master"
-    - "ES_JAVA_OPTS=-Xms${client_heap_size} -Xmx${client_heap_size}"
-    - "node.master=false"
-    - "node.data=false"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nofile:
-        soft: 65536
-        hard: 65536
-    mem_limit: ${client_mem_limit}
-    mem_swappiness: 0
-    cap_add:
-    - IPC_LOCK
-    volumes_from:
-    - es-storage
-    depends_on:
-    - es-master
+nuxeo:
+  environment:
+    NUXEO_CLID: ${clid}
+    NUXEO_PACKAGES: ${packages}
+    NUXEO_DB_HOST: postgres
+    NUXEO_DB_TYPE: postgresql
+    NUXEO_ES_HOSTS: elasticsearch:9300
+    NUXEO_DATA: /data/nuxeo/data/
+    NUXEO_LOG: /data/nuxeo/log/
+    NUXEO_REDIS_HOST: redis
+    NUXEO_URL: ${url}
+  labels:
+    io.rancher.sidekicks: nuxeo-datavolume    
+    io.rancher.container.hostname_override: container_name
+    io.rancher.scheduler.affinity:container_label_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
+  image: nuxeo:FT
+  links:
+  - redis:redis
+  - postgres:postgres
+  - elasticsearch-masters:elasticsearch
+  volumes_from:
+  - nuxeo-datavolume
 
-  es-storage:
-    labels:
-      io.rancher.container.start_once: true
-    network_mode: none
-    image: rawmind/alpine-volume:0.0.2-1
-    environment:
-    - SERVICE_UID=1000
-    - SERVICE_GID=1000
-    - SERVICE_VOLUME=/usr/share/elasticsearch/data
-    volumes:
-    - es-storage-volume:/usr/share/elasticsearch/data
+lb:
+  expose:
+  - 55080:8080
+  image: rancher/load-balancer-service
+  links:
+  - nuxeo:nuxeo
 
-  {{- if eq .Values.UPDATE_SYSCTL "true" }}
-  es-sysctl:
-    labels:
-      io.rancher.container.start_once: true
-    network_mode: none
-    image: rawmind/alpine-sysctl:0.1
-    privileged: true
-    environment:
-    - "SYSCTL_KEY=vm.max_map_count"
-    - "SYSCTL_VALUE=262144"
-  {{- end}}
-volumes:
-  es-storage-volume:
-    driver: ${VOLUME_DRIVER}
-    per_container: true
