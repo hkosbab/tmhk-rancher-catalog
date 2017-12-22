@@ -5,12 +5,12 @@ services:
       volumes:
         - 'mariadb_data:/mariadb'
       environment:
-        - MARIADB_ROOT_PASSWORD=${mariadb_root_password}
-        - MARIADB_USER=${db_user}
-        - MARIADB_PASSWORD=${db_password}
-        - MARIADB_DATABASE=${db_name}
+        - MYSQL_ROOT_PASSWORD=${mariadb_root_password}
+        - MYSQL_USER=${db_user}
+        - MYSQL_PASSWORD=${db_password}
+        - MYSQL_DATABASE=${db_name}
   vtiger:
-      image: ldavid/vtiger7
+      image: hkosbab/vtiger
       ports:
       - 22280:80
       volumes:
