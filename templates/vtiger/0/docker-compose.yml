@@ -16,12 +16,7 @@ services:
       volumes:
       - vtiger:/var/www/html/
       depends_on:
-        - mariadb
-      environment:
-        - DB_HOSTNAME=mariadb
-        - DB_NAME=${db_name}
-        - DB_USERNAME=${db_user} 
-        - DB_PASSWORD=${db_password}       
+        - mariadb      
 volumes:
   mariadb_data:
     driver: ${volume_driver}
