@@ -1,7 +1,61 @@
-.catalog:
-  name: # Name of the versioned template of the Catalog Entry
-  version: # Version of the versioned template of the Catalog Entry
-  description: # Description of the versioned template of the Catalog Entry
-  uuid: # Unique identifier to be used for upgrades. Please see note.
-  minimum_rancher_version: # The minimum version of Rancher that supports the template
-  questions: #Used to request user input for configuration options
+version: '2'
+catalog:
+  name: "vtiger"
+  version: "v0.1-tmhk"
+  description: "vtiger CRM"
+  uuid: vTiger-1
+  minimum_rancher_version: v0.51.0
+  questions:    
+    - variable: public_port
+      description: "public port to access the drupal site"
+      label: "Public Port"
+      required: true
+      default: "80"
+      type: "int"
+    - variable: mariadb_root_password
+      description: "MariaDB root password, set on first run"
+      label: "MariaDB Root Password"
+      required: true
+      default: "mariadb_my_root"
+      type: "string"
+    - variable: mariadb_user
+      description: "MariaDB database user, created on first run"
+      label: "MariaDB Database User"
+      required: true
+      default: "drupal_user"
+      type: "string"
+    - variable: mariadb_user_password
+      description: "MariaDB database user password, set on first run"
+      label: "MariaDB Database User Password"
+      required: true
+      default: "drupal_password"
+      type: "string"
+    - variable: mariadb_database_name
+      description: "Drupal database name"
+      label: "Drupal database name"
+      required: true
+      default: "bitnami_drupal"
+      type: "string"  
+    - variable: drupal_username
+      description: "Drupal application username"
+      label: "Drupal application username"
+      required: true
+      default: "admin"
+      type: "string"  
+    - variable: drupal_password
+      description: "Drupal application password"
+      label: "Drupal application password"
+      required: true
+      default: "bitnami"
+      type: "string"       
+    - variable: volume_driver
+      description: "Volume driver to use with this service"
+      label: "Volume driver"
+      required: true
+      default: "local"
+      type: enum
+      options:
+        - local
+        - rancher-nfs
+        - rancher-efs
+        - rancher-ebs
