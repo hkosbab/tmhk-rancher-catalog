@@ -12,7 +12,7 @@ services:
   vtiger:
       image: ldavid/vtiger7
       ports:
-      - 80:80
+      - 22280:80
       volumes:
       - vtiger:/var/www/html/
       depends_on:
