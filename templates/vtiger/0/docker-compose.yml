@@ -1,14 +1,14 @@
 version: '2'
 services:
   mariadb:
-      image: 'mariadb:10.3'
+      image: 'mariadb:latest'
       volumes:
         - 'mariadb_data:/mariadb'
       environment:
         - MARIADB_ROOT_PASSWORD=${mariadb_root_password}
-        - MARIADB_USER=${mariadb_user}
-        - MARIADB_PASSWORD=${mariadb_user_password}
-        - MARIADB_DATABASE=${mariadb_database_name}
+        - MARIADB_USER=${db_user}
+        - MARIADB_PASSWORD=${db_password}
+        - MARIADB_DATABASE=${db_name}
   vtiger:
       image: ldavid/vtiger7
       ports:
@@ -18,11 +18,10 @@ services:
       depends_on:
         - mariadb
       environment:
-        - DRUPAL_DATABASE_NAME=${mariadb_database_name}
-        - DRUPAL_DATABASE_USER=${mariadb_user} 
-        - DRUPAL_DATABASE_PASSWORD=${mariadb_user_password}       
-        - DRUPAL_USERNAME=${drupal_username}
-        - DRUPAL_PASSWORD=${drupal_password}
+        - DB_HOSTNAME=mariadb
+        - DB_NAME=${db_name}
+        - DB_USERNAME=${db_user} 
+        - DB_PASSWORD=${db_password}       
 volumes:
   mariadb_data:
     driver: ${volume_driver}
