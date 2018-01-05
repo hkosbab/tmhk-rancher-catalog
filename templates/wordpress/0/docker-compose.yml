@@ -5,10 +5,10 @@ services:
       volumes:
         - 'mariadb_data:/mariadb'
       environment:
-        - MARIADB_ROOT_PASSWORD=${mariadb_root_password}
-        - MARIADB_USER=${mariadb_user}
-        - MARIADB_PASSWORD=${mariadb_user_password}
-        - MARIADB_DATABASE=${mariadb_database_name}
+        - MYSQL_ROOT_PASSWORD=${mariadb_root_password}
+        - MYSQL_USER=${db_user}
+        - MYSQL_PASSWORD=${db_password}
+        - MYSQL_DATABASE=${db_name}
   wordpress:
       image: 'hkosbab/wordpress:latest'
       volumes:
