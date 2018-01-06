@@ -13,6 +13,7 @@ services:
       image: 'hkosbab/wordpress:latest'
       volumes:
         - 'wordpress_data:/var/www/html/wordpress/wp-content'
+        - 'wordpress_conf:/var/www/html/wordpress/'
       depends_on:
         - mariadb
 volumes:
