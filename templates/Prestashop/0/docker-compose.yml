@@ -4,12 +4,12 @@ services:
     image: mariadb:latest
     environment:
       MYSQL_ROOT_PASSWORD: qVdj1G9y90y2
-      MYSQL_USER: dbu_{summary}
-      MYSQL_DATABASE: dbo_{summary}
+      MYSQL_USER: dbu_${summary}
+      MYSQL_DATABASE: dbo_${summary}
       MYSQL_PASSWORD: lnM6G86ou6i2
     stdin_open: true
     volumes:
-    - customer_{summary}:/var/lib/mysql
+    - customer_${summary}:/var/lib/mysql
     tty: true
     labels:
       io.rancher.container.pull_image: always
@@ -26,7 +26,7 @@ services:
     image: hkosbab/prestashop
     stdin_open: true
     volumes:
-    - customer_{summary}_data:/var/www/html
+    - customer_${summary}_data:/var/www/html
     tty: true
     links:
     - mariadb:db
