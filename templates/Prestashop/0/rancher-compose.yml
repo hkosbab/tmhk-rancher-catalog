@@ -6,7 +6,7 @@ catalog:
   uuid: 'prestashop-1'# Unique identifier to be used for upgrades. Please see note.
   minimum_rancher_version: v0.51.0 # The minimum version of Rancher that supports the template
   questions: #Used to request user input for configuration options
-   - variable: Domain
+   - variable: domain
       description: "public port to access the drupal site"
       label: "Domain"
       required: true
