@@ -1,5 +1,5 @@
 version: '2'
-catalog:
+.catalog:
   name: "vtiger"
   version: "v0.1-tmhk"
   description: "vtiger CRM"

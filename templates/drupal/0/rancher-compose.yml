@@ -1,5 +1,5 @@
 version: '2'
-catalog:
+.catalog:
   name: "Drupal"
   version: "v0.2-tmhk"
   description: "Blog tool, publishing platform and CMS based on bitnami images"
