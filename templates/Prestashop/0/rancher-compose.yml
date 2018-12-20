@@ -1,5 +1,5 @@
 version: '2'
-.catalog:
+catalog:
   name: 'Prestashop'
   version: '1.6.1.18'# Version of the versioned template of the Catalog Entry
   description: # Description of the versioned template of the Catalog Entry
