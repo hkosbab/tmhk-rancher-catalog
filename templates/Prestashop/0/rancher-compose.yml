@@ -6,18 +6,18 @@ catalog:
   uuid: 'prestashop-1'# Unique identifier to be used for upgrades. Please see note.
   minimum_rancher_version: v0.51.0 # The minimum version of Rancher that supports the template
   questions: #Used to request user input for configuration options
-   - variable: domain
-      description: "public port to access the drupal site"
-      label: "Domain"
-      required: true
-      default: "example.com"
-      type: "string"
+  - variable: domain
+    description: "public port to access the drupal site"
+    label: "Domain"
+    required: true
+    default: "example.com"
+    type: "string"
   - variable: summary
-      description: "Short summary"
-      label: "Summary for DB and user"
-      required: true
-      default: "ex"
-      type: "string"  
+    description: "Short summary"
+    label: "Summary for DB and user"
+    required: true
+    default: "ex"
+    type: "string"  
 services:
   mariadb:
     drain_timeout_ms: 200
@@ -29,13 +29,13 @@ services:
     lb_config:
       certs: []
       port_rules:
-      - hostname: www.{Domain}
+      - hostname: www.{domain}
         priority: 2
         protocol: http
         service: prestashop
         source_port: 80
         target_port: 80
-      - hostname: {Domain}
+      - hostname: {domain}
         path: ''
         priority: 3
         protocol: http
